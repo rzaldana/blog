@@ -1,0 +1,3 @@
+[submodule "submodules/blink"]
+	path = submodules/blink
+	url = https://github.com/rzaldana/blink.git

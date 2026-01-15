@@ -10,13 +10,25 @@ test_write_sends_message_to_configured_fd() {
   # shellcheck disable=SC2064
   trap "rm $tmpfile" EXIT
 
-  __blog.set_log_level "DEBUG"
   blog.set_destination_fd "3"
   __blog.write <<<"$message" 3>"$tmpfile"
 
   assert_no_diff "$tmpfile" <(echo "$message")
 }
 
+test_write_sends_message_to_stderr_if_fd_is_not_configured() {
+  set -euo pipefail
+  source "$SCRIPT_DIR/../blog.bash"
+  local message="my message"
+  # Create tmpfile to store output
+  tmpfile="$(mktemp)"
+  # shellcheck disable=SC2064
+  trap "rm $tmpfile" EXIT
+
+  __blog.write <<<"$message" 2>"$tmpfile"
+
+  assert_no_diff "$tmpfile" <(echo "$message")
+}
 
 test_filter_forwards_message_if_message_log_level_is_higher_than_set_log_level() {
   set -euo pipefail
