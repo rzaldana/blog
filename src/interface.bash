@@ -1,45 +1,68 @@
 #!/usr/bin/env bash
 
 source core.bash
+source format_fn.bash
+source helper.bash
+source defaults.bash
+
+
+__blog.interface.log() {
+  if ! __blog.helper.is_format_fn_set; then
+    __blog.set_format_function "$(__blog.defaults.format_fn)"
+  fi
+  local log_level_name
+  log_level_name="$1"
+  local log_level_int
+  log_level_int="$(__blog.helper.get_log_level_int "$log_level_name")"
+  __blog.log "$log_level_int"
+}
+
+__blog.interface.set_level() {
+  local log_level_name
+  log_level_name="$1"
+  local log_level_int
+  log_level_int="$(__blog.helper.get_log_level_int "$log_level_name")"
+  __blog.set_log_level "$log_level_int"
+}
 
 blog.set_level_debug() {
-  __blog.set_log_level "0"
+  __blog.interface.set_level "DEBUG"
 }
 
 blog.debug() {
-  __blog.log "0"
+  __blog.interface.log "DEBUG"
 }
 
 blog.set_level_info() {
-  __blog.set_log_level "1"
+  __blog.interface.set_level "INFO"
 }
 
 blog.info() {
-  __blog.log "1"
+  __blog.interface.log "INFO"
 }
 
 blog.set_level_warn() {
-  __blog.set_log_level "2"
+  __blog.interface.set_level "WARN"
 }
 
 blog.warn() {
-  __blog.log "2"
+  __blog.interface.log "WARN"
 }
 
 blog.set_level_error() {
-  __blog.set_log_level "3"
+  __blog.interface.set_level "ERROR"
 }
 
 blog.error() {
-  __blog.log "3"
+  __blog.interface.log "ERROR"
 }
 
 blog.set_level_fatal() {
-  __blog.set_log_level "4"
+  __blog.interface.set_level "FATAL"
 }
 
 blog.fatal() {
-  __blog.log "4"
+  __blog.interface.log "FATAL"
 }
 
 blog.set_level_off() {
@@ -54,4 +77,12 @@ blog.set_level_off() {
 
   # set the log level to maxint
   __blog.set_log_level "$maxint"
+}
+
+blog.set_format_raw() {
+  __blog.set_format_function "__blog.format_fn.raw"
+}
+
+blog.set_format_bracketed() {
+  __blog.set_format_function "__blog.format_fn.bracketed"
 }

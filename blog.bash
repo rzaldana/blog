@@ -2,12 +2,6 @@
 
 
 ########## START library core.bash ###########
-__blog.format_fn.raw() {
-  while IFS= read -r line; do
-    echo "$line"
-  done
-}
-
 __blog.get_default_log_level() {
   echo "2"
 }
@@ -87,44 +81,179 @@ __blog.log() {
 ########## END library core.bash ###########
 
 
+########## START library format_fn.bash ###########
+__blog.format_fn.helper.get_log_level_name() {
+  local log_level
+  log_level="$1"
+  case "$log_level" in
+    0)
+      echo "DEBUG"
+      ;;
+    1)
+      echo "INFO"
+      ;;
+    2)
+      echo "WARN"
+      ;;
+    3)
+      echo "ERROR"
+      ;;
+    4)
+      echo "FATAL"
+      ;;
+    *)
+      echo "UNKNOWN"
+      ;;
+  esac
+}
+
+__blog.format_fn.raw() {
+  while IFS= read -r line; do
+    echo "$line"
+  done
+}
+
+__blog.format_fn.bracketed() {
+  local log_level
+  log_level="$1"
+  local log_level_name
+  # shellcheck disable=SC2119
+  log_level_name="$(__blog.format_fn.helper.get_log_level_name "$log_level")"
+  while IFS= read -r line; do
+    printf "[%7s]: %s\n" "$log_level_name" "$line"
+  done
+}
+########## END library format_fn.bash ###########
+
+
+########## START library helper.bash ###########
+__blog.helper.get_log_level_name() {
+  local log_level
+  log_level="$1"
+  case "$log_level" in
+    0)
+      echo "DEBUG"
+      ;;
+    1)
+      echo "INFO"
+      ;;
+    2)
+      echo "WARN"
+      ;;
+    3)
+      echo "ERROR"
+      ;;
+    4)
+      echo "FATAL"
+      ;;
+    *)
+      echo "UNKNOWN"
+      ;;
+  esac
+}
+
+__blog.helper.get_log_level_int() {
+  local log_level_name
+  log_level_name="$1"
+  case "$log_level_name" in
+    DEBUG)
+      echo "0"
+      ;;
+    INFO)
+      echo "1"
+      ;;
+    WARN)
+      echo "2"
+      ;;
+    ERROR)
+      echo "3"
+      ;;
+    FATAL)
+      echo "4"
+      ;;
+    *)
+      echo "10000000"
+      ;;
+  esac
+}
+
+__blog.helper.is_format_fn_set() {
+  if [[ -n "${__BLOG_FORMAT_FUNCTION:-}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+########## END library helper.bash ###########
+
+
+########## START library defaults.bash ###########
+#!/usr/bin/env bash
+
+__blog.defaults.format_fn() {
+  echo "__blog.format_fn.bracketed"
+}
+########## END library defaults.bash ###########
+
+
+
+__blog.interface.log() {
+  if ! __blog.helper.is_format_fn_set; then
+    __blog.set_format_function "$(__blog.defaults.format_fn)"
+  fi
+  local log_level_name
+  log_level_name="$1"
+  local log_level_int
+  log_level_int="$(__blog.helper.get_log_level_int "$log_level_name")"
+  __blog.log "$log_level_int"
+}
+
+__blog.interface.set_level() {
+  local log_level_name
+  log_level_name="$1"
+  local log_level_int
+  log_level_int="$(__blog.helper.get_log_level_int "$log_level_name")"
+  __blog.set_log_level "$log_level_int"
+}
+
 blog.set_level_debug() {
-  __blog.set_log_level "0"
+  __blog.interface.set_level "DEBUG"
 }
 
 blog.debug() {
-  __blog.log "0"
+  __blog.interface.log "DEBUG"
 }
 
 blog.set_level_info() {
-  __blog.set_log_level "1"
+  __blog.interface.set_level "INFO"
 }
 
 blog.info() {
-  __blog.log "1"
+  __blog.interface.log "INFO"
 }
 
 blog.set_level_warn() {
-  __blog.set_log_level "2"
+  __blog.interface.set_level "WARN"
 }
 
 blog.warn() {
-  __blog.log "2"
+  __blog.interface.log "WARN"
 }
 
 blog.set_level_error() {
-  __blog.set_log_level "3"
+  __blog.interface.set_level "ERROR"
 }
 
 blog.error() {
-  __blog.log "3"
+  __blog.interface.log "ERROR"
 }
 
 blog.set_level_fatal() {
-  __blog.set_log_level "4"
+  __blog.interface.set_level "FATAL"
 }
 
 blog.fatal() {
-  __blog.log "4"
+  __blog.interface.log "FATAL"
 }
 
 blog.set_level_off() {
@@ -139,4 +268,12 @@ blog.set_level_off() {
 
   # set the log level to maxint
   __blog.set_log_level "$maxint"
+}
+
+blog.set_format_raw() {
+  __blog.set_format_function "__blog.format_fn.raw"
+}
+
+blog.set_format_bracketed() {
+  __blog.set_format_function "__blog.format_fn.bracketed"
 }

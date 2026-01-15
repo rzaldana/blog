@@ -1,6 +1,6 @@
 .PHONY: test
 
-.image_tags: ./test/Dockerfile
+.image_tags: ./test/Dockerfile SUPPORTED_BASH_VERSIONS
 	@./scripts/build_test_containers
 
 blog.bash: ./src/core.bash ./src/interface.bash

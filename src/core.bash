@@ -1,9 +1,3 @@
-__blog.format_fn.raw() {
-  while IFS= read -r line; do
-    echo "$line"
-  done
-}
-
 __blog.get_default_log_level() {
   echo "2"
 }
