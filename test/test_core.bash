@@ -76,6 +76,27 @@ test_filter_discards_message_if_message_log_level_is_lower_than_set_log_level() 
   assert_no_diff "$tmpfile" <(echo -n "")
 }
 
+test_filter_sets_log_level_to_2_if_log_level_is_unset() {
+  set -euo pipefail
+  source "$SCRIPT_DIR/../blog.bash"
+  local message="my message"
+  # Create tmpfile to store output
+  tmpfile="$(mktemp)"
+  # shellcheck disable=SC2064
+  trap "rm $tmpfile" EXIT
+
+  __blog.filter "1" <<<"$message" >"$tmpfile"
+  assert_no_diff "$tmpfile" <(echo -n "")
+  : > "$tmpfile"
+
+  __blog.filter "2" <<<"$message" >"$tmpfile"
+  assert_no_diff "$tmpfile" <(echo "$message")
+  : > "$tmpfile"
+
+  __blog.filter "3" <<<"$message" >"$tmpfile"
+  assert_no_diff "$tmpfile" <(echo "$message")
+}
+
 test_format_runs_configured_format_function() {
   set -euo pipefail
   source "$SCRIPT_DIR/../blog.bash"
