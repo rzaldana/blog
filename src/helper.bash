@@ -55,3 +55,11 @@ __blog.helper.is_format_fn_set() {
     return 1
   fi
 }
+
+__blog.helper.is_level_set() {
+  if [[ -n "${__BLOG_LEVEL:-}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}

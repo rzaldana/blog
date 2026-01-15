@@ -10,8 +10,8 @@ __blog.get_default_format_function() {
   echo "__blog.format_fn.raw"
 }
 
-__blog.set_log_level() {
-  export __BLOG_LOG_LEVEL="$1"
+__blog.set_level() {
+  export __BLOG_LEVEL="$1"
 }
 
 __blog.get_default_destination_fd() {
@@ -37,7 +37,7 @@ __blog.filter() {
   local default_log_level
   default_log_level="$(__blog.get_default_log_level)"
   local set_log_level
-  set_log_level="${__BLOG_LOG_LEVEL:-$default_log_level}"
+  set_log_level="${__BLOG_LEVEL:-$default_log_level}"
   
   local message_log_level
   message_log_level="$1"

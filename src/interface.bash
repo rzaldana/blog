@@ -10,6 +10,11 @@ __blog.interface.log() {
   if ! __blog.helper.is_format_fn_set; then
     __blog.set_format_function "$(__blog.defaults.format_fn)"
   fi
+
+  if ! __blog.helper.is_level_set; then
+    __blog.set_level "$(__blog.defaults.level)"
+  fi
+
   local log_level_name
   log_level_name="$1"
   local log_level_int
@@ -22,7 +27,7 @@ __blog.interface.set_level() {
   log_level_name="$1"
   local log_level_int
   log_level_int="$(__blog.helper.get_log_level_int "$log_level_name")"
-  __blog.set_log_level "$log_level_int"
+  __blog.set_level "$log_level_int"
 }
 
 blog.set_level_debug() {
@@ -76,7 +81,7 @@ blog.set_level_off() {
   done 
 
   # set the log level to maxint
-  __blog.set_log_level "$maxint"
+  __blog.set_level "$maxint"
 }
 
 blog.set_format_raw() {

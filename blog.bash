@@ -14,8 +14,8 @@ __blog.get_default_format_function() {
   echo "__blog.format_fn.raw"
 }
 
-__blog.set_log_level() {
-  export __BLOG_LOG_LEVEL="$1"
+__blog.set_level() {
+  export __BLOG_LEVEL="$1"
 }
 
 __blog.get_default_destination_fd() {
@@ -41,7 +41,7 @@ __blog.filter() {
   local default_log_level
   default_log_level="$(__blog.get_default_log_level)"
   local set_log_level
-  set_log_level="${__BLOG_LOG_LEVEL:-$default_log_level}"
+  set_log_level="${__BLOG_LEVEL:-$default_log_level}"
   
   local message_log_level
   message_log_level="$1"
@@ -184,6 +184,14 @@ __blog.helper.is_format_fn_set() {
     return 1
   fi
 }
+
+__blog.helper.is_level_set() {
+  if [[ -n "${__BLOG_LEVEL:-}" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
 ########## END library helper.bash ###########
 
 
@@ -193,6 +201,10 @@ __blog.helper.is_format_fn_set() {
 __blog.defaults.format_fn() {
   echo "__blog.format_fn.bracketed"
 }
+
+__blog.defaults.level() {
+  echo "2"
+}
 ########## END library defaults.bash ###########
 
 
@@ -201,6 +213,11 @@ __blog.interface.log() {
   if ! __blog.helper.is_format_fn_set; then
     __blog.set_format_function "$(__blog.defaults.format_fn)"
   fi
+
+  if ! __blog.helper.is_level_set; then
+    __blog.set_level "$(__blog.defaults.level)"
+  fi
+
   local log_level_name
   log_level_name="$1"
   local log_level_int
@@ -213,7 +230,7 @@ __blog.interface.set_level() {
   log_level_name="$1"
   local log_level_int
   log_level_int="$(__blog.helper.get_log_level_int "$log_level_name")"
-  __blog.set_log_level "$log_level_int"
+  __blog.set_level "$log_level_int"
 }
 
 blog.set_level_debug() {
@@ -267,7 +284,7 @@ blog.set_level_off() {
   done 
 
   # set the log level to maxint
-  __blog.set_log_level "$maxint"
+  __blog.set_level "$maxint"
 }
 
 blog.set_format_raw() {

@@ -3,3 +3,7 @@
 __blog.defaults.format_fn() {
   echo "__blog.format_fn.bracketed"
 }
+
+__blog.defaults.level() {
+  echo "2"
+}

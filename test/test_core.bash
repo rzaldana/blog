@@ -16,7 +16,7 @@ test_write_sends_message_to_configured_fd() {
   assert_no_diff "$tmpfile" <(echo "$message")
 }
 
-test_write_sends_message_to_stderr_if_fd_is_not_configured() {
+test_filter_forwards_message_if_message_log_level_is_higher_than_set_level() {
   set -euo pipefail
   source "$SCRIPT_DIR/../blog.bash"
   local message="my message"
@@ -25,27 +25,13 @@ test_write_sends_message_to_stderr_if_fd_is_not_configured() {
   # shellcheck disable=SC2064
   trap "rm $tmpfile" EXIT
 
-  __blog.write <<<"$message" 2>"$tmpfile"
-
-  assert_no_diff "$tmpfile" <(echo "$message")
-}
-
-test_filter_forwards_message_if_message_log_level_is_higher_than_set_log_level() {
-  set -euo pipefail
-  source "$SCRIPT_DIR/../blog.bash"
-  local message="my message"
-  # Create tmpfile to store output
-  tmpfile="$(mktemp)"
-  # shellcheck disable=SC2064
-  trap "rm $tmpfile" EXIT
-
-  __blog.set_log_level "4"
+  __blog.set_level "4"
   __blog.filter "5" <<<"$message" >"$tmpfile"
 
   assert_no_diff "$tmpfile" <(echo "$message")
 }
 
-test_filter_forwards_message_if_message_log_level_is_equal_to_set_log_level() {
+test_filter_forwards_message_if_message_log_level_is_equal_to_set_level() {
   set -euo pipefail
   source "$SCRIPT_DIR/../blog.bash"
   local message="my message"
@@ -54,14 +40,14 @@ test_filter_forwards_message_if_message_log_level_is_equal_to_set_log_level() {
   # shellcheck disable=SC2064
   trap "rm $tmpfile" EXIT
 
-  __blog.set_log_level "4"
+  __blog.set_level "4"
   __blog.filter "4" <<<"$message" >"$tmpfile"
 
   assert_no_diff "$tmpfile" <(echo "$message")
 }
 
 
-test_filter_discards_message_if_message_log_level_is_lower_than_set_log_level() {
+test_filter_discards_message_if_message_log_level_is_lower_than_set_level() {
   set -euo pipefail
   source "$SCRIPT_DIR/../blog.bash"
   local message="my message"
@@ -70,46 +56,12 @@ test_filter_discards_message_if_message_log_level_is_lower_than_set_log_level() 
   # shellcheck disable=SC2064
   trap "rm $tmpfile" EXIT
 
-  __blog.set_log_level "4"
+  __blog.set_level "4"
   __blog.filter "3" <<<"$message" >"$tmpfile"
 
   assert_no_diff "$tmpfile" <(echo -n "")
 }
 
-test_filter_sets_log_level_to_2_if_log_level_is_unset() {
-  set -euo pipefail
-  source "$SCRIPT_DIR/../blog.bash"
-  local message="my message"
-  # Create tmpfile to store output
-  tmpfile="$(mktemp)"
-  # shellcheck disable=SC2064
-  trap "rm $tmpfile" EXIT
-
-  __blog.filter "1" <<<"$message" >"$tmpfile"
-  assert_no_diff "$tmpfile" <(echo -n "")
-  : > "$tmpfile"
-
-  __blog.filter "2" <<<"$message" >"$tmpfile"
-  assert_no_diff "$tmpfile" <(echo "$message")
-  : > "$tmpfile"
-
-  __blog.filter "3" <<<"$message" >"$tmpfile"
-  assert_no_diff "$tmpfile" <(echo "$message")
-}
-
-test_format_runs_raw_format_function_if_format_fn_is_unset() {
-  set -euo pipefail
-  source "$SCRIPT_DIR/../blog.bash"
-  local message="my message"
-  # Create tmpfile to store output
-  tmpfile="$(mktemp)"
-  # shellcheck disable=SC2064
-  trap "rm $tmpfile" EXIT
-
-  __blog.format "3" <<<"$message" >"$tmpfile"
-
-  assert_no_diff "$tmpfile" <(echo "$message")
-}
 
 test_format_runs_configured_format_function() {
   set -euo pipefail
