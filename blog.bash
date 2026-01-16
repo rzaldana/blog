@@ -88,22 +88,46 @@ __blog.write.write() {
 
 
 ########## START library log.bash ###########
-__blog.log() {
-  local log_level
-  log_level="$1"
+__blog.log.log() {
+  local log_level_name
+  log_level_name="$1"
+
+  # use defualt format fn if not set
+  if ! __blog.format.is_format_fn_set; then
+    __blog.format.set_format_function "$(__blog.log.default_format_fn)"
+  fi
+
+  # use default destination fd if not set
+  if ! __blog.write.is_destination_fd_set; then
+    __blog.write.set_destination_fd "$(__blog.log.default_destination_fd)"
+  fi
+
+  local log_level_int
+  log_level_int="$(__blog.log.get_log_level_int "$log_level_name")"
 
   while IFS= read -r log_line; do
     echo "$log_line" \
-      | __blog.filter.filter "$log_level" \
-      | __blog.format.format "$log_level" \
+      | __blog.filter.filter "$log_level_int" \
+      | __blog.format.format "$log_level_int" \
       | __blog.write.write
   done
 }
-########## END library log.bash ###########
 
 
-########## START library format_fn.bash ###########
-__blog.format_fn.helper.get_log_level_name() {
+__blog.log.default_format_fn() {
+  echo "__blog.log.bracketed_format_fn"
+}
+
+__blog.log.default_level() {
+  echo "2" # warn
+}
+
+__blog.log.default_destination_fd() {
+  echo "2" # stderr
+}
+
+
+__blog.log.get_log_level_name() {
   local log_level
   log_level="$1"
   case "$log_level" in
@@ -128,52 +152,7 @@ __blog.format_fn.helper.get_log_level_name() {
   esac
 }
 
-__blog.format_fn.raw() {
-  while IFS= read -r line; do
-    echo "$line"
-  done
-}
-
-__blog.format_fn.bracketed() {
-  local log_level
-  log_level="$1"
-  local log_level_name
-  # shellcheck disable=SC2119
-  log_level_name="$(__blog.format_fn.helper.get_log_level_name "$log_level")"
-  while IFS= read -r line; do
-    printf "[%7s]: %s\n" "$log_level_name" "$line"
-  done
-}
-########## END library format_fn.bash ###########
-
-
-########## START library helper.bash ###########
-__blog.helper.get_log_level_name() {
-  local log_level
-  log_level="$1"
-  case "$log_level" in
-    0)
-      echo "DEBUG"
-      ;;
-    1)
-      echo "INFO"
-      ;;
-    2)
-      echo "WARN"
-      ;;
-    3)
-      echo "ERROR"
-      ;;
-    4)
-      echo "FATAL"
-      ;;
-    *)
-      echo "UNKNOWN"
-      ;;
-  esac
-}
-
-__blog.helper.get_log_level_int() {
+__blog.log.get_log_level_int() {
   local log_level_name
   log_level_name="$1"
   case "$log_level_name" in
@@ -198,6 +177,72 @@ __blog.helper.get_log_level_int() {
   esac
 }
 
+#__blog.format_fn.helper.get_log_level_name() {
+#  local log_level
+#  log_level="$1"
+#  case "$log_level" in
+#    0)
+#      echo "DEBUG"
+#      ;;
+#    1)
+#      echo "INFO"
+#      ;;
+#    2)
+#      echo "WARN"
+#      ;;
+#    3)
+#      echo "ERROR"
+#      ;;
+#    4)
+#      echo "FATAL"
+#      ;;
+#    *)
+#      echo "UNKNOWN"
+#      ;;
+#  esac
+#}
+
+__blog.log.raw_format_fn() {
+  while IFS= read -r line; do
+    echo "$line"
+  done
+}
+
+__blog.log.bracketed_format_fn() {
+  local log_level
+  log_level="$1"
+  local log_level_name
+  # shellcheck disable=SC2119
+  log_level_name="$(__blog.log.get_log_level_name "$log_level")"
+  while IFS= read -r line; do
+    printf "[%7s]: %s\n" "$log_level_name" "$line"
+  done
+}
+
+__blog.log.set_level() {
+  local log_level_name
+  log_level_name="$1"
+  local log_level_int
+  log_level_int="$(__blog.log.get_log_level_int "$log_level_name")"
+  __blog.filter.set_level "$log_level_int"
+}
+
+__blog.log.set_destination_fd() {
+  local destination_fd
+  destination_fd="$1"
+  __blog.write.set_destination_fd "$destination_fd"
+}
+
+__blog.log.set_format_fn() {
+  local format_fn
+  format_fn="$1"
+  __blog.format.set_format_function "$format_fn"
+}
+########## END library log.bash ###########
+
+
+########## START library helper.bash ###########
+
 
 
 ########## END library helper.bash ###########
@@ -207,7 +252,7 @@ __blog.helper.get_log_level_int() {
 #!/usr/bin/env bash
 
 __blog.defaults.format_fn() {
-  echo "__blog.format_fn.bracketed"
+  echo "__blog.log.bracketed_format_fn"
 }
 
 __blog.defaults.level() {
@@ -304,9 +349,9 @@ blog.set_level_off() {
 }
 
 blog.set_format_raw() {
-  __blog.format.set_format_function "__blog.format_fn.raw"
+  __blog.format.set_format_function "__blog.log.raw_format_fn"
 }
 
 blog.set_format_bracketed() {
-  __blog.format.set_format_function "__blog.format_fn.bracketed"
+  __blog.format.set_format_function "__blog.log.bracketed_format_fn"
 }

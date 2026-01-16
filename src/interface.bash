@@ -4,7 +4,6 @@ source format.bash
 source filter.bash
 source write.bash
 source log.bash
-source format_fn.bash
 source helper.bash
 source defaults.bash
 
@@ -92,9 +91,9 @@ blog.set_level_off() {
 }
 
 blog.set_format_raw() {
-  __blog.format.set_format_function "__blog.format_fn.raw"
+  __blog.format.set_format_function "__blog.log.raw_format_fn"
 }
 
 blog.set_format_bracketed() {
-  __blog.format.set_format_function "__blog.format_fn.bracketed"
+  __blog.format.set_format_function "__blog.log.bracketed_format_fn"
 }
