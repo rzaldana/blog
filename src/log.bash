@@ -12,6 +12,11 @@ __blog.log.log() {
     __blog.write.set_destination_fd "$(__blog.log.default_destination_fd)"
   fi
 
+  # use default log level if level is not set
+  if ! __blog.filter.is_level_set; then
+    __blog.filter.set_level "$(__blog.log.default_level)"
+  fi
+
   local log_level_int
   log_level_int="$(__blog.log.get_log_level_int "$log_level_name")"
 

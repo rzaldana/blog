@@ -102,6 +102,11 @@ __blog.log.log() {
     __blog.write.set_destination_fd "$(__blog.log.default_destination_fd)"
   fi
 
+  # use default log level if level is not set
+  if ! __blog.filter.is_level_set; then
+    __blog.filter.set_level "$(__blog.log.default_level)"
+  fi
+
   local log_level_int
   log_level_int="$(__blog.log.get_log_level_int "$log_level_name")"
 
@@ -177,30 +182,6 @@ __blog.log.get_log_level_int() {
   esac
 }
 
-#__blog.format_fn.helper.get_log_level_name() {
-#  local log_level
-#  log_level="$1"
-#  case "$log_level" in
-#    0)
-#      echo "DEBUG"
-#      ;;
-#    1)
-#      echo "INFO"
-#      ;;
-#    2)
-#      echo "WARN"
-#      ;;
-#    3)
-#      echo "ERROR"
-#      ;;
-#    4)
-#      echo "FATAL"
-#      ;;
-#    *)
-#      echo "UNKNOWN"
-#      ;;
-#  esac
-#}
 
 __blog.log.raw_format_fn() {
   while IFS= read -r line; do
