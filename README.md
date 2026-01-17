@@ -1,4 +1,4 @@
-# log.bash 🪵
+# 🪵 log.bash 
 A tiny, no‑nonsense logging library for Bash 
 
 It gives you clean log levels, simple formatting, and predictable output, all through a lightweight shell‑friendly API. 
