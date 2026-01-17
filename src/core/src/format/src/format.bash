@@ -1,4 +1,4 @@
-__blog.format.is_format_fn_set() {
+__log.format.is_format_fn_set() {
   if [[ -n "${__BLOG_FORMAT_FORMAT_FUNCTION:-}" ]]; then
     return 0
   else
@@ -6,11 +6,11 @@ __blog.format.is_format_fn_set() {
   fi
 }
 
-__blog.format.set_format_function() {
+__log.format.set_format_function() {
   export __BLOG_FORMAT_FORMAT_FUNCTION="$1"
 }
 
-__blog.format.format() {
+__log.format.format() {
   format_function="${__BLOG_FORMAT_FORMAT_FUNCTION}"
 
   local message_log_level
