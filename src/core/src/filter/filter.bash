@@ -1,4 +1,4 @@
-__blog.filter.is_level_set() {
+__log.filter.is_level_set() {
   if [[ -n "${__BLOG_FILTER_LEVEL:-}" ]]; then
     return 0
   else
@@ -6,13 +6,13 @@ __blog.filter.is_level_set() {
   fi
 }
 
-__blog.filter.set_level() {
+__log.filter.set_level() {
   local level
   level="$1"
   export __BLOG_FILTER_LEVEL="$level"
 }
 
-__blog.filter.filter() {
+__log.filter.filter() {
   local set_log_level
   set_log_level="${__BLOG_FILTER_LEVEL}"
   
