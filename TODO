@@ -1,3 +1,8 @@
 1. Add tests for format functions
+2. Create json format function
+3. Add util to retrieve date and use in formatting functions
+    - util should check for availability of `date` tool when loaded and have sane behaviour if tool is not present
+3. Add util to print color and use in formatting function
+    - util should check if terminal is connected and have sane behaviour if not connected (i.e. omit color codes)
 2. Add tests for default functions in core
-3. Add tests for interface (top level log.bash)
+3. Add more integration tests

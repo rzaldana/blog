@@ -1,0 +1,7 @@
+[test.bash][ INFO]: hello
+[test.bash][ WARN]: bye
+hello
+bye
+[test.bash][ INFO]: hello
+[test.bash][ WARN]: bye
+[test.bash][ERROR]: hello
