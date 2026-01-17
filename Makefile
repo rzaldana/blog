@@ -15,11 +15,11 @@ DOCKERFILE := $(DOCKER_CONTEXT)/Dockerfile
 
 SUPPORTED_VERSIONS_FILE := $(ROOT_DIR)/SUPPORTED_BASH_VERSIONS
 
-# All .bash files except those starting with test_ 
-SRC_BASH := $(filter-out $(CURRENT_DIR)/test_%.bash,$(wildcard $(CURRENT_DIR)/*.bash)) 
+# All .bash files in ./src 
+SRC_BASH := $(wildcard $(CURRENT_DIR)/src/*.bash)
 
-# Map them into dist/ 
-DIST_BASH := $(patsubst $(CURRENT_DIR)/%.bash,$(CURRENT_DIR)/dist/%.bash,$(SRC_BASH))
+# Map them into ./
+DST_BASH := $(patsubst $(CURRENT_DIR)/src/%.bash,$(CURRENT_DIR)/%.bash,$(SRC_BASH))
 
 $(IMAGE_TAGS_FILE): $(ROOT_DIR)/Dockerfile $(ROOT_DIR)/SUPPORTED_BASH_VERSIONS
 	@if [[ -f "$(IMAGE_TAGS_FILE)" ]]; then \
@@ -38,21 +38,20 @@ $(IMAGE_TAGS_FILE): $(ROOT_DIR)/Dockerfile $(ROOT_DIR)/SUPPORTED_BASH_VERSIONS
   	echo "$$image_tag" >> "$(IMAGE_TAGS_FILE)"; \
 	done < "$(SUPPORTED_VERSIONS_FILE)"
 
-build: $(DIST_BASH)
+build: $(DST_BASH)
 
-$(CURRENT_DIR)/dist/%.bash: $(CURRENT_DIR)/%.bash 
-	@mkdir -p "$(CURRENT_DIR)/dist" 
+$(CURRENT_DIR)/%.bash: $(CURRENT_DIR)/src/%.bash 
 	@$(ROOT_DIR)/submodules/blink/blink "$<" "$@"
 
 
-test: $(IMAGE_TAGS_FILE) $(DIST_BASH)
+test: $(IMAGE_TAGS_FILE) $(DST_BASH)
 	@while IFS= read -r image_tag; do \
 		echo "========== running tests in image $$image_tag =========="; \
 		docker run \
 		--rm \
 		--tty \
 		--volume "$(CURRENT_DIR):/var/task" \
-		--entrypoint bash_unit "$$image_tag" $(CURRENT_DIR)/test_*.bash; \
+		--entrypoint bash_unit "$$image_tag" $(CURRENT_DIR)/test/test_*.bash; \
 	done < "$(IMAGE_TAGS_FILE)"
 
 
