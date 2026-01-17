@@ -42,9 +42,9 @@ blog.fatal() {
 }
 
 blog.set_format_raw() {
-  __blog.core.set_format_fn "__blog.core.raw_format_fn"
+  __blog.core.set_format_raw
 }
 
 blog.set_format_bracketed() {
-  __blog.core.set_format_fn "__blog.core.bracketed_format_fn"
+  __blog.core.set_format_bracketed
 }

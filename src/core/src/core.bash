@@ -114,8 +114,10 @@ __blog.core.set_destination_fd() {
   __blog.write.set_destination_fd "$destination_fd"
 }
 
-__blog.core.set_format_fn() {
-  local format_fn
-  format_fn="$1"
-  __blog.format.set_format_function "$format_fn"
+__blog.core.set_format_bracketed() {
+  __blog.format.set_format_function "__blog.format_fn.bracketed_format_fn"
+}
+
+__blog.core.set_format_raw() {
+  __blog.format.set_format_function "__blog.format_fn.raw_format_fn"
 }

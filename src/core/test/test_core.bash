@@ -12,7 +12,8 @@ test_log_maps_log_level_name_to_int_and_sends_message_through_filter_format_writ
   format_level_tmpfile="$(mktemp)"
   # shellcheck disable=SC2064
   trap "rm $tmpfile $filter_level_tmpfile $format_level_tmpfile" EXIT
-  
+ 
+  # shellcheck disable=SC2317 
   # mock filter function
   __blog.filter.filter() {
     filter_got_level="$1"
@@ -23,6 +24,8 @@ test_log_maps_log_level_name_to_int_and_sends_message_through_filter_format_writ
   }
  
   declare format_got_level
+
+  # shellcheck disable=SC2317 
   # mock format function
   __blog.format.format() {
     format_got_level="$1"
@@ -33,6 +36,7 @@ test_log_maps_log_level_name_to_int_and_sends_message_through_filter_format_writ
   }
 
   # mock write function
+  # shellcheck disable=SC2317 
   __blog.write.write() {
     while IFS= read -r line; do
       echo "[written] $line"
@@ -40,8 +44,6 @@ test_log_maps_log_level_name_to_int_and_sends_message_through_filter_format_writ
   }
   
 
-  __blog.core.set_format_fn "mock_format"
-  # shellcheck disable=SC2119
   __blog.core.log "WARN" <<<"$message" >"$tmpfile"
 
   assert_no_diff "$tmpfile" <(echo "[written] [formatted] [filtered] $message")
@@ -89,13 +91,6 @@ test_log_uses_default_destination_fd_if_no_destination_fd_is_configured() {
   trap "rm '$tmpfile'" EXIT
 
 
-  # mock bracketed format_fn
-  mock_format_fn() {
-  # shellcheck disable=SC2317
-    while IFS= read -r line; do
-     echo "$line" 
-    done
-  }
 
   # shellcheck disable=SC2317
   __blog.core.default_format_fn() {
@@ -108,7 +103,7 @@ test_log_uses_default_destination_fd_if_no_destination_fd_is_configured() {
 
 
   __blog.core.set_level "DEBUG"
-  __blog.core.set_format_fn "mock_format_fn"
+  __blog.core.set_format_raw
   __blog.core.log "DEBUG" <<<"hello!" 6>"$tmpfile"
   assert_no_diff "$tmpfile" <( echo "hello!" )
   : > "$tmpfile" # clear file contents
@@ -124,18 +119,11 @@ test_log_function_uses_default_level_if_no_level_is_configured() {
   trap "rm '$tmpfile'" EXIT
 
   # shellcheck disable=SC2317
-  mock_format_fn() {
-    while IFS= read -r line; do 
-      echo "$line"
-    done
-  }
-
-  # shellcheck disable=SC2317
   __blog.core.default_level() {
     echo "1" 
   }
 
-  __blog.core.set_format_fn "mock_format_fn"
+  __blog.core.set_format_raw
 
   __blog.core.log "DEBUG" <<<"hello!" 2>"$tmpfile"
   assert_no_diff "$tmpfile" <( echo -n "")

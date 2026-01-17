@@ -89,6 +89,27 @@ __blog.write.write() {
 ########## END library write.bash ###########
 
 
+########## START library format_fn.bash ###########
+
+__blog.format_fn.raw_format_fn() {
+  while IFS= read -r line; do
+    echo "$line"
+  done
+}
+
+__blog.format_fn.bracketed_format_fn() {
+  local log_level
+  log_level="$1"
+  local log_level_name
+  # shellcheck disable=SC2119
+  log_level_name="$(__blog.core.get_log_level_name "$log_level")"
+  while IFS= read -r line; do
+    printf "[%7s]: %s\n" "$log_level_name" "$line"
+  done
+}
+########## END library format_fn.bash ###########
+
+
 __blog.core.log() {
   local log_level_name
   log_level_name="$1"
@@ -121,7 +142,7 @@ __blog.core.log() {
 
 
 __blog.core.default_format_fn() {
-  echo "__blog.core.bracketed_format_fn"
+  echo "__blog.format_fn.bracketed_format_fn"
 }
 
 __blog.core.default_level() {
@@ -184,22 +205,6 @@ __blog.core.get_log_level_int() {
 }
 
 
-__blog.core.raw_format_fn() {
-  while IFS= read -r line; do
-    echo "$line"
-  done
-}
-
-__blog.core.bracketed_format_fn() {
-  local log_level
-  log_level="$1"
-  local log_level_name
-  # shellcheck disable=SC2119
-  log_level_name="$(__blog.core.get_log_level_name "$log_level")"
-  while IFS= read -r line; do
-    printf "[%7s]: %s\n" "$log_level_name" "$line"
-  done
-}
 
 __blog.core.set_level() {
   local log_level_name
@@ -215,10 +220,12 @@ __blog.core.set_destination_fd() {
   __blog.write.set_destination_fd "$destination_fd"
 }
 
-__blog.core.set_format_fn() {
-  local format_fn
-  format_fn="$1"
-  __blog.format.set_format_function "$format_fn"
+__blog.core.set_format_bracketed() {
+  __blog.format.set_format_function "__blog.format_fn.bracketed_format_fn"
+}
+
+__blog.core.set_format_raw() {
+  __blog.format.set_format_function "__blog.format_fn.raw_format_fn"
 }
 ########## END library core.bash ###########
 
@@ -264,9 +271,9 @@ blog.fatal() {
 }
 
 blog.set_format_raw() {
-  __blog.core.set_format_fn "__blog.core.raw_format_fn"
+  __blog.core.set_format_raw
 }
 
 blog.set_format_bracketed() {
-  __blog.core.set_format_fn "__blog.core.bracketed_format_fn"
+  __blog.core.set_format_bracketed
 }
