@@ -1,8 +1,7 @@
+- Add ability to turn off timestamp (e.g. log.no_date and log.date )
+- Add ability to turn off color (e.g. log.no_color and log.color )
 - Add tests for format functions
 - Add testts for wrapper format functions in core (or generalize log level name normalization logic)
-- Create json format function
-- Add util to retrieve date and use in formatting functions
-    - util should check for availability of `date` tool when loaded and have sane behaviour if tool is not present
 - Add util to print color and use in formatting function
     - util should check if terminal is connected and have sane behaviour if not connected (i.e. omit color codes)
 - Add tests for default functions in core
