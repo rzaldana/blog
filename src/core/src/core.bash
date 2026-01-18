@@ -36,7 +36,7 @@ __log.core.log() {
 
 
 __log.core.default_format_fn() {
-  echo "__log.core.format_fn.bracketed_format_fn"
+  echo "__log.core.bracketed_format_fn"
 }
 
 __log.core.default_level() {
@@ -144,12 +144,48 @@ __log.core.format_fn_wrapper() {
   done
 }
 
+__log.core.raw_format_fn() {
+  while IFS= read -r line; do
+    echo "$line"
+  done
+}
+
+__log.core.bracketed_format_fn() {
+  local log_level_name
+  log_level_name="$1"
+
+  # get parent script's name
+  local parent_script_name
+  parent_script_name="$(__log.core.format_fn.utils.get_parent_script_name)"
+
+  while IFS= read -r line; do
+    printf "[%s][%5s]: %s\n" "$parent_script_name" "$log_level_name" "$line"
+  done
+}
+
+
+__log.core.json_format_fn() {
+  local log_level_name
+  log_level_name="$1"
+
+  # get parent script's name
+  local parent_script_name
+  parent_script_name="$(__log.core.format_fn.utils.get_parent_script_name)"
+
+  while IFS= read -r line; do
+    __log.core.format_fn.utils.json.object.new \
+      | __log.core.format_fn.utils.json.object.add_key_value "parent" "$parent_script_name" \
+      | __log.core.format_fn.utils.json.object.add_key_value "level" "$log_level_name" \
+      | __log.core.format_fn.utils.json.object.add_key_value "message" "$line"
+  done
+}
+
 __log.core.set_format_bracketed() {
-  __log.core.set_format_fn "__log.core.format_fn.bracketed_format_fn"
+  __log.core.set_format_fn "__log.core.bracketed_format_fn"
 }
 
 __log.core.set_format_raw() {
-  __log.core.set_format_fn "__log.core.format_fn.raw_format_fn"
+  __log.core.set_format_fn "__log.core.raw_format_fn"
 }
 
 __log.core.set_format_json() {
@@ -158,8 +194,8 @@ __log.core.set_format_json() {
     __log.core.set_format_fn "$(__log.core.default_format_fn)"
     return 0
   fi
-  __log.core.set_format_fn "__log.core.format_fn.json_format_fn"
+  __log.core.set_format_fn "__log.core.json_format_fn"
 }
 
-# Set format.format_function to core.format_fn.wrapper
+# Set format.format_function to core.format_fn_wrapper
 __log.core.format.set_format_function "__log.core.format_fn_wrapper"
