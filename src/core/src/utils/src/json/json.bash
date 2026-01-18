@@ -1,11 +1,11 @@
 
-__log.core.format_fn.utils.json.is_jq_installed() {
+__log.core.utils.json.is_jq_installed() {
   if ! command -v jq >/dev/null 2>&1; then
     return 1 
   fi
 }
 
-__log.core.format_fn.utils.json.object.new() {
+__log.core.utils.json.object.new() {
   jq \
     --monochrome-output \
     --null-input \
@@ -13,7 +13,7 @@ __log.core.format_fn.utils.json.object.new() {
     '{}'
 }
 
-__log.core.format_fn.utils.json.object.add_key_value() {
+__log.core.utils.json.object.add_key_value() {
   IFS= read -r -d '' object || :
     local key
     local value

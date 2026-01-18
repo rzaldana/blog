@@ -16,7 +16,7 @@ source ./json/json.bash
 #     0: "always" 
 # tags:
 #   - "std"
-__log.core.format_fn.utils.get_parent_script_name() {
+__log.core.utils.get_parent_script_name() {
   # Get the length of FUNCNAME
   local -i funcname_length
   funcname_length="${#FUNCNAME[@]}" 

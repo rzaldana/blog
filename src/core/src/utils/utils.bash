@@ -1,17 +1,14 @@
 
 
-########## START library utils.bash ###########
-
-
 ########## START library json.bash ###########
 
-__log.core.format_fn.utils.json.is_jq_installed() {
+__log.core.utils.json.is_jq_installed() {
   if ! command -v jq >/dev/null 2>&1; then
     return 1 
   fi
 }
 
-__log.core.format_fn.utils.json.object.new() {
+__log.core.utils.json.object.new() {
   jq \
     --monochrome-output \
     --null-input \
@@ -19,7 +16,7 @@ __log.core.format_fn.utils.json.object.new() {
     '{}'
 }
 
-__log.core.format_fn.utils.json.object.add_key_value() {
+__log.core.utils.json.object.add_key_value() {
   IFS= read -r -d '' object || :
     local key
     local value
@@ -53,7 +50,7 @@ __log.core.format_fn.utils.json.object.add_key_value() {
 #     0: "always" 
 # tags:
 #   - "std"
-__log.core.format_fn.utils.get_parent_script_name() {
+__log.core.utils.get_parent_script_name() {
   # Get the length of FUNCNAME
   local -i funcname_length
   funcname_length="${#FUNCNAME[@]}" 
@@ -62,6 +59,3 @@ __log.core.format_fn.utils.get_parent_script_name() {
   top_level_index=$(( funcname_length - 1 ))
   printf "%s" "$( basename "${BASH_SOURCE[$top_level_index]}" )"
 }
-########## END library utils.bash ###########
-
-

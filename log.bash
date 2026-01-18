@@ -89,21 +89,18 @@ __log.core.write.write() {
 ########## END library write.bash ###########
 
 
-########## START library format_fn.bash ###########
-
-
 ########## START library utils.bash ###########
 
 
 ########## START library json.bash ###########
 
-__log.core.format_fn.utils.json.is_jq_installed() {
+__log.core.utils.json.is_jq_installed() {
   if ! command -v jq >/dev/null 2>&1; then
     return 1 
   fi
 }
 
-__log.core.format_fn.utils.json.object.new() {
+__log.core.utils.json.object.new() {
   jq \
     --monochrome-output \
     --null-input \
@@ -111,7 +108,7 @@ __log.core.format_fn.utils.json.object.new() {
     '{}'
 }
 
-__log.core.format_fn.utils.json.object.add_key_value() {
+__log.core.utils.json.object.add_key_value() {
   IFS= read -r -d '' object || :
     local key
     local value
@@ -145,7 +142,7 @@ __log.core.format_fn.utils.json.object.add_key_value() {
 #     0: "always" 
 # tags:
 #   - "std"
-__log.core.format_fn.utils.get_parent_script_name() {
+__log.core.utils.get_parent_script_name() {
   # Get the length of FUNCNAME
   local -i funcname_length
   funcname_length="${#FUNCNAME[@]}" 
@@ -155,9 +152,6 @@ __log.core.format_fn.utils.get_parent_script_name() {
   printf "%s" "$( basename "${BASH_SOURCE[$top_level_index]}" )"
 }
 ########## END library utils.bash ###########
-
-
-########## END library format_fn.bash ###########
 
 
 __log.core.log() {
@@ -312,7 +306,7 @@ __log.core.bracketed_format_fn() {
 
   # get parent script's name
   local parent_script_name
-  parent_script_name="$(__log.core.format_fn.utils.get_parent_script_name)"
+  parent_script_name="$(__log.core.utils.get_parent_script_name)"
 
   while IFS= read -r line; do
     printf "[%s][%5s]: %s\n" "$parent_script_name" "$log_level_name" "$line"
@@ -326,13 +320,13 @@ __log.core.json_format_fn() {
 
   # get parent script's name
   local parent_script_name
-  parent_script_name="$(__log.core.format_fn.utils.get_parent_script_name)"
+  parent_script_name="$(__log.core.utils.get_parent_script_name)"
 
   while IFS= read -r line; do
-    __log.core.format_fn.utils.json.object.new \
-      | __log.core.format_fn.utils.json.object.add_key_value "parent" "$parent_script_name" \
-      | __log.core.format_fn.utils.json.object.add_key_value "level" "$log_level_name" \
-      | __log.core.format_fn.utils.json.object.add_key_value "message" "$line"
+    __log.core.utils.json.object.new \
+      | __log.core.utils.json.object.add_key_value "parent" "$parent_script_name" \
+      | __log.core.utils.json.object.add_key_value "level" "$log_level_name" \
+      | __log.core.utils.json.object.add_key_value "message" "$line"
   done
 }
 
@@ -345,7 +339,7 @@ __log.core.set_format_raw() {
 }
 
 __log.core.set_format_json() {
-  if ! __log.core.format_fn.utils.json.is_jq_installed; then
+  if ! __log.core.utils.json.is_jq_installed; then
     echo "log.bash: WARNING: format was set to json but jq is not available. Using default format" >&2
     __log.core.set_format_fn "$(__log.core.default_format_fn)"
     return 0

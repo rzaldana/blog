@@ -1,3 +1,0 @@
-
-source ./utils/utils.bash
-
